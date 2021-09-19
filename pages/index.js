@@ -24,11 +24,18 @@ const assignRoles = async () => {
 function Page() {
   const [session] = useSession();
   const [rolesSet, setRoles] = useState(null);
+  const [loadingRoles, setLoadingRoles] = useState(false);
 
   const doAssignRoles = async () => {
+    setLoadingRoles(true);
     const rolesResponse = await assignRoles();
     setRoles(rolesResponse);
+    setLoadingRoles(false);
   };
+
+  if (loadingRoles) {
+    return "Trying to set roles.....";
+  }
 
   if (rolesSet) {
     return (
