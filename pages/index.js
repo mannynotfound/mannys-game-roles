@@ -48,11 +48,11 @@ function Page() {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://discord.gg/ADFS4JAdTa"
+              href="https://discord.gg/Mxb9jWekFV"
             >
               Discord community
             </a>
-            ? Auth your Discord to get roles for your the CryptOrchids you own!
+            ? Auth your Discord to get roles for the manny tokens you own!
           </p>
           <button onClick={() => signIn("discord")}>Auth Discord</button>
         </div>

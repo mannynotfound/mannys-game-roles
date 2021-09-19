@@ -19,6 +19,7 @@ const roleMap = {
   Holo: "889011581134983188",
   Albino: "889011358690058260",
   "Base Rare": "889154168701480970",
+  Gamer: "889003509511495691",
 };
 
 const rolePicker = (ownedTokens) => {
@@ -46,6 +47,9 @@ const rolePicker = (ownedTokens) => {
   };
 
   const roles = [];
+  if (ownedTokens.length) {
+    roles.push(roleMap["Gamer"]);
+  }
   ownedTokens.forEach((token) => {
     let isBase = token <= 403;
 
