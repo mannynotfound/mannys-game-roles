@@ -61,7 +61,7 @@ function Page() {
             </a>
             ? Auth your Discord to get roles for the manny tokens you own!
           </p>
-          <button onClick={() => signIn()}>Auth Discord</button>
+          <button onClick={() => signIn("discord")}>Auth Discord</button>
         </div>
       )}
       {session && (
