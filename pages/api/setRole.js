@@ -55,12 +55,14 @@ const rolePicker = (ownedTokens) => {
 
     Object.keys(tokenMap).forEach((role) => {
       if (tokenMap[role].some((roleId) => roleId === token)) {
-        roles.push(roleMap[role]);
+        if (!roles.includes(roleMap[role])) {
+          roles.push(roleMap[role]);
+        }
         isBase = false;
       }
     });
 
-    if (isBase) {
+    if (isBase && !roles.includes(roleMap["Base Rare"])) {
       roles.push(roleMap["Base Rare"]);
     }
   });
