@@ -2,6 +2,12 @@ import { Contract, providers, utils } from "ethers";
 import ABI from "./abi.json";
 import { getSession } from "next-auth/client";
 
+const asyncForEach = async (array, callback) => {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+};
+
 const rpc = new providers.JsonRpcProvider(
   "https://mainnet.infura.io/v3/fde9986431614271aeacb5ad8d709168"
 );
@@ -98,34 +104,28 @@ export default async (req, res) => {
     }
   });
 
-  const result = await Promise.all([
-    addRoles.map(async (roleId) => {
-      return fetch(
-        `https://discord.com/api/guilds/${guildId}/members/${session.userId}/roles/${roleId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-          },
-        }
-      );
-    }),
-    removeRoles.map(async (roleId) => {
-      return fetch(
-        `https://discord.com/api/guilds/${guildId}/members/${session.userId}/roles/${roleId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-          },
-        }
-      );
-    }),
-  ]).catch((error) => {
-    return {
-      statusCode: 200,
-      body: JSON.stringify(error),
-    };
+  const result = await asyncForEach(addRoles, async (roleId) => {
+    return fetch(
+      `https://discord.com/api/guilds/${guildId}/members/${session.userId}/roles/${roleId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+        },
+      }
+    );
+  });
+
+  const removeResult = await asyncForEach(removeRoles, async (roleId) => {
+    return fetch(
+      `https://discord.com/api/guilds/${guildId}/members/${session.userId}/roles/${roleId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+        },
+      }
+    );
   });
 
   const roleNames = newRoles.map((nr) =>
