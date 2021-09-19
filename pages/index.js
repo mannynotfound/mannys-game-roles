@@ -1,12 +1,70 @@
-import Layout from '../components/layout'
+import { signIn, useSession } from "next-auth/client";
+import React, { useState } from "react";
+import Web3 from "web3";
 
-export default function Page () {
+const assignRoles = async () => {
+  let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+  const accounts = await web3.eth.requestAccounts();
+
+  const sig = await web3.eth.personal.sign(
+    "Claiming Discord Roles",
+    accounts[0]
+  );
+
+  return fetch("/api/setRole", {
+    body: JSON.stringify({
+      sig,
+    }),
+    method: "POST",
+  }).then((response) => {
+    return response.json();
+  });
+};
+
+function Page() {
+  const [session] = useSession();
+  const [rolesSet, setRoles] = useState(null);
+
+  const doAssignRoles = async () => {
+    const rolesResponse = await assignRoles();
+    setRoles(rolesResponse);
+  };
+
+  if (rolesSet) {
+    return (
+      <>
+        <h3>Successfully set roles: </h3>
+        <code>{JSON.stringify(rolesSet, 0, 2)}</code>
+      </>
+    );
+  }
+
   return (
-    <Layout>
-      <h1>NextAuth.js Example</h1>
-      <p>
-        This is an example site to demonstrate how to use <a href={`https://next-auth.js.org`}>NextAuth.js</a> for authentication.
-      </p>
-    </Layout>
-  )
+    <main>
+      {!session && (
+        <div>
+          <p>
+            Member of our{" "}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://discord.gg/ADFS4JAdTa"
+            >
+              Discord community
+            </a>
+            ? Auth your Discord to get roles for your the CryptOrchids you own!
+          </p>
+          <button onClick={() => signIn("discord")}>Auth Discord</button>
+        </div>
+      )}
+      {session && (
+        <div>
+          <p>To claim your roles, sign a message</p>
+          <button onClick={doAssignRoles}>Sign Message</button>
+        </div>
+      )}
+    </main>
+  );
 }
+
+export default Page;
