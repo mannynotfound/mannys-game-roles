@@ -23,7 +23,7 @@
     "@web3-react/core": "^6.1.9",
     "ethers": "^5.4.7",
     "next": "^11.0.0",
-    "next-auth": "latest",
+    "next-auth": "3.29.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sqlite3": "^5.0.2",
