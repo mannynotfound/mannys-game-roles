@@ -202,7 +202,7 @@ const rolePicker = (ownedTokens) => {
 
   ownedTokens.forEach((token) => {
     const isBase = Object.keys(skinMap).every((skin) => {
-      return skinMap[skin].tokens.every((tId) => tId !== tokenId);
+      return skinMap[skin].tokens.every((tokenId) => tokenId !== token);
     });
 
     Object.keys(skinMap).forEach((skin) => {
