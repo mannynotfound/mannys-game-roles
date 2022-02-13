@@ -1,31 +1,7 @@
 import { signIn, useSession } from "next-auth/client";
-import React, { useState, Suspense } from "react";
-import Web3 from "web3";
-import { Canvas } from "@react-three/fiber";
-import * as THREE from "three";
-import { OrbitControls, useFBX } from "@react-three/drei";
-import Manny, { CHEERING, TYPING } from "../components/Manny";
-import { Chair, Desk, Computer, Keyboard } from "../components/Objects";
-import Screen from "../components/Screen";
-
-const assignRoles = async () => {
-  let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-  const accounts = await web3.eth.requestAccounts();
-
-  const sig = await web3.eth.personal.sign(
-    "Claiming Discord Roles",
-    accounts[0]
-  );
-
-  return fetch("/api/setRole", {
-    body: JSON.stringify({
-      sig,
-    }),
-    method: "POST",
-  }).then((response) => {
-    return response.json();
-  });
-};
+import React, { useState } from "react";
+import Scene from "../components/Scene";
+import { Web3Consumer } from "../helpers/web3context";
 
 const getColor = (role) => {
   const roleMap = {
@@ -62,10 +38,73 @@ const DiscordIcon = () => (
   </svg>
 );
 
-function Page() {
+const EthIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fillRule="evenodd"
+    clipRule="evenodd"
+    imageRendering="optimizeQuality"
+    shapeRendering="geometricPrecision"
+    textRendering="geometricPrecision"
+    width="30"
+    height="30"
+    viewBox="0 0 784.37 1277.39"
+  >
+    <g>
+      <g fillRule="nonzero">
+        <path
+          fill="currentColor"
+          d="M392.07 0L383.5 29.11 383.5 873.74 392.07 882.29 784.13 650.54z"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M392.07 0L0 650.54 392.07 882.29 392.07 472.33z"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M392.07 956.52L387.24 962.41 387.24 1263.28 392.07 1277.38 784.37 724.89z"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M392.07 1277.38L392.07 956.52 0 724.89z"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M392.07 882.29L784.13 650.54 392.07 472.33z"
+        ></path>
+        <path
+          fill="currentColor"
+          d="M0 650.54L392.07 882.29 392.07 472.33z"
+        ></path>
+      </g>
+    </g>
+  </svg>
+);
+
+function Page({ web3 }) {
+  console.log(web3);
   const [session] = useSession();
   const [rolesSet, setRoles] = useState(null);
   const [loadingRoles, setLoadingRoles] = useState(false);
+
+  const assignRoles = async () => {
+    const sig = await web3.signer
+      .signMessage("Claiming Discord Roles")
+      .catch((error) => alert(error.message));
+
+    if (!sig) {
+      return null;
+    }
+
+    return fetch("/api/setRole", {
+      body: JSON.stringify({
+        sig,
+      }),
+      method: "POST",
+    }).then((response) => {
+      return response.json();
+    });
+  };
 
   const doAssignRoles = async () => {
     setLoadingRoles(true);
@@ -113,7 +152,7 @@ function Page() {
         </div>
       </>
     );
-  } else if (session) {
+  } else if (session && web3.address) {
     Body = (
       <>
         <h3
@@ -123,6 +162,9 @@ function Page() {
             fontWeight: "bolder",
           }}
         >
+          Connected as{" ..."}
+          {web3.address.substring(web3.address.length - 4, web3.address.length)}
+          <br />
           Sign a message with your Web3 provider to claim your roles
         </h3>
         <div
@@ -136,47 +178,36 @@ function Page() {
           }}
           onClick={doAssignRoles}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fillRule="evenodd"
-            clipRule="evenodd"
-            imageRendering="optimizeQuality"
-            shapeRendering="geometricPrecision"
-            textRendering="geometricPrecision"
-            width="30"
-            height="30"
-            viewBox="0 0 784.37 1277.39"
-          >
-            <g>
-              <g fillRule="nonzero">
-                <path
-                  fill="currentColor"
-                  d="M392.07 0L383.5 29.11 383.5 873.74 392.07 882.29 784.13 650.54z"
-                ></path>
-                <path
-                  fill="currentColor"
-                  d="M392.07 0L0 650.54 392.07 882.29 392.07 472.33z"
-                ></path>
-                <path
-                  fill="currentColor"
-                  d="M392.07 956.52L387.24 962.41 387.24 1263.28 392.07 1277.38 784.37 724.89z"
-                ></path>
-                <path
-                  fill="currentColor"
-                  d="M392.07 1277.38L392.07 956.52 0 724.89z"
-                ></path>
-                <path
-                  fill="currentColor"
-                  d="M392.07 882.29L784.13 650.54 392.07 472.33z"
-                ></path>
-                <path
-                  fill="currentColor"
-                  d="M0 650.54L392.07 882.29 392.07 472.33z"
-                ></path>
-              </g>
-            </g>
-          </svg>
+          <EthIcon />
           <h2 style={{ margin: "0 0 0 10px" }}>Sign</h2>
+        </div>
+      </>
+    );
+  } else if (session) {
+    Body = (
+      <>
+        <h3
+          style={{
+            letterSpacing: -0.8,
+            margin: "0 0 10px 0",
+            fontWeight: "bolder",
+          }}
+        >
+          Connect your wallet
+        </h3>
+        <div
+          className="btn"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            marginTop: 20,
+            padding: "10px 20px",
+            borderRadius: 10,
+          }}
+          onClick={web3.loadWeb3Modal}
+        >
+          <EthIcon />
+          <h2 style={{ margin: "0 0 0 10px" }}>Connect</h2>
         </div>
       </>
     );
@@ -251,62 +282,9 @@ function Page() {
           {Body}
         </div>
       </div>
-      <div className="three-container">
-        <Canvas
-          linear
-          camera={{ zoom: 1, position: [0, 0.5, 1.5] }}
-          onCreated={({ gl }) => {
-            gl.toneMapping = THREE.LinearToneMapping;
-          }}
-        >
-          <Suspense fallback={null}>
-            <Manny
-              scale={0.01}
-              position={[0, -1, -1]}
-              animation={TYPING}
-              rotation={[0, -Math.PI / 180, 0]}
-            />
-            <Chair
-              position={[0, -0.84, -0.95]}
-              scale={0.005}
-              rotation={[0, Math.PI / 180, 0]}
-            />
-            <Desk
-              position={[0.05, -1, -0.2]}
-              scale={0.008}
-              rotation={[0, Math.PI / 2, 0]}
-            />
-            <Computer
-              position={[0, -0.35, -0.1]}
-              scale={0.0006}
-              rotation={[0, Math.PI, 0]}
-            />
-            <Screen
-              scale={0.072}
-              position={[0, -0.12, -0.11]}
-              rotation={[0, Math.PI, 0]}
-            />
-            <Keyboard position={[0, -0.35, -0.3]} scale={0.0007} />
-            <OrbitControls />
-            <hemisphereLight
-              skyColor={0xffffff}
-              groundColor={0x444444}
-              position={[0, 0, 0]}
-            />
-            <directionalLight
-              color={0xffffff}
-              intensity={0.25}
-              castShadow
-              position={[0, 200, 100]}
-            />
-          </Suspense>
-        </Canvas>
-      </div>
+      <Scene />
     </main>
   );
 }
 
-useFBX.preload(CHEERING);
-useFBX.preload(TYPING);
-
-export default Page;
+export default Web3Consumer(Page);

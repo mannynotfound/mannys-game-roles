@@ -1,6 +1,7 @@
 import { Contract, providers, utils } from "ethers";
 import ABI from "./abi.json";
 import { getSession } from "next-auth/client";
+import fetch from "isomorphic-fetch";
 
 const asyncForEach = async (array, callback) => {
   for (let index = 0; index < array.length; index++) {
@@ -234,6 +235,9 @@ export default async (req, res) => {
   const session = await getSession({ req });
   const { sig } = JSON.parse(req.body);
   const address = utils.verifyMessage("Claiming Discord Roles", sig);
+  if (!sig || !address) {
+    return res.send({});
+  }
   const ownedTokens = await mannysGame.tokensByOwner(address);
   const newRoles = rolePicker(ownedTokens);
 
@@ -286,5 +290,14 @@ export default async (req, res) => {
     Object.keys(roleMap).find((rm) => roleMap[rm] === nr)
   );
 
-  res.send(JSON.stringify({ rolesEarned: roleNames, result }));
+  // log achievement
+  fetch("https://mannys.game/api/achievements/30000", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ sig, address }),
+  });
+
+  res.send(JSON.stringify({ rolesEarned: roleNames, result, address }));
 };

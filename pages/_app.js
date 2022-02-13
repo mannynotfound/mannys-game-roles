@@ -1,9 +1,11 @@
-import { Provider } from 'next-auth/client'
-import './styles.css'
+import { Provider } from "next-auth/client";
+import { Web3Provider } from "../helpers/web3context";
+
+import "./styles.css";
 
 // Use the <Provider> to improve performance and allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
-export default function App ({ Component, pageProps }) {
+export default function App({ Component, pageProps }) {
   return (
     <Provider
       // Provider options are not required but can be useful in situations where
@@ -21,10 +23,13 @@ export default function App ({ Component, pageProps }) {
         //
         // Note: If a session has expired when keep alive is triggered, all open
         // windows / tabs will be updated to reflect the user is signed out.
-        keepAlive: 0
+        keepAlive: 0,
       }}
-      session={pageProps.session} >
-      <Component {...pageProps} />
+      session={pageProps.session}
+    >
+      <Web3Provider>
+        <Component {...pageProps} />
+      </Web3Provider>
     </Provider>
-  )
+  );
 }
