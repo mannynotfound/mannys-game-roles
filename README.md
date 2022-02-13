@@ -1,4 +1,7 @@
-<img src="cover.JPG" width="80%" style="margin:0 auto;" />
+<p align="center">
+  <br />
+  <img src="cover.JPG" width="80%" />
+</p>
 
 # mannys-game-roles
 
