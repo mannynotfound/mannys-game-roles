@@ -247,23 +247,45 @@ function Page({ web3 }) {
             </div>
           ))}
         </div>
-        <a
-          className="discord-btn"
-          target="_blank"
-          rel="noreferrer"
-          href="https://discord.gg/Mxb9jWekFV"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            marginTop: 40,
-            padding: "5px 10px",
-            borderRadius: 10,
-            textDecoration: "none",
-          }}
-        >
-          <DiscordIcon />
-          <h4 style={{ margin: "0 0 0 20px" }}>Launch Discord</h4>
-        </a>
+        <div style={{ display: "flex", marginTop: 20 }}>
+          <a
+            className="discord-btn"
+            target="_blank"
+            rel="noreferrer"
+            href="https://discord.gg/Mxb9jWekFV"
+            style={{
+              display: "inline-flex",
+              flex: 1,
+              alignItems: "center",
+              textAlign: "left",
+              padding: "5px 10px",
+              borderRadius: 10,
+              textDecoration: "none",
+            }}
+          >
+            <DiscordIcon />
+            <h4 style={{ margin: "0 0 0 10px" }}>Launch Discord</h4>
+          </a>
+          <a
+            className="btn"
+            target="_blank"
+            rel="noreferrer"
+            href="https://mannys.game/achievements"
+            style={{
+              display: "inline-flex",
+              flex: 1,
+              alignItems: "center",
+              marginLeft: 10,
+              padding: "5px 10px",
+              borderRadius: 10,
+              textDecoration: "none",
+              textAlign: "left",
+            }}
+          >
+            <img src="/assets/goldmanny.png" width="30" height="auto" />
+            <h4 style={{ margin: "0 0 0 10px" }}>Check Achievements</h4>
+          </a>
+        </div>
       </>
     );
   }
