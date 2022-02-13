@@ -2,6 +2,7 @@ import { signIn, useSession } from "next-auth/client";
 import React, { useState } from "react";
 import Scene from "../components/Scene";
 import { Web3Consumer } from "../helpers/web3context";
+import { CHEERING } from "../components/Manny";
 
 const getColor = (role) => {
   const roleMap = {
@@ -112,7 +113,9 @@ function Page({ web3 }) {
     setRoles(rolesResponse);
     setLoadingRoles(false);
   };
+
   let Body = null;
+  const sceneProps = {};
 
   if (!session) {
     Body = (
@@ -217,7 +220,8 @@ function Page({ web3 }) {
     Body = <p>Trying to set roles.....</p>;
   }
 
-  if (rolesSet) {
+  if (rolesSet?.rolesEarned?.length) {
+    sceneProps.animation = CHEERING;
     Body = (
       <>
         <h2
@@ -304,7 +308,7 @@ function Page({ web3 }) {
           {Body}
         </div>
       </div>
-      <Scene />
+      <Scene {...sceneProps} />
     </main>
   );
 }
