@@ -9,7 +9,7 @@ const asyncForEach = async (array, callback) => {
 };
 
 const rpc = new providers.JsonRpcProvider(
-  "https://mainnet.infura.io/v3/fde9986431614271aeacb5ad8d709168"
+  `https://mainnet.infura.io/v3/${process.env.INFURA_ID}`
 );
 
 const mgAddress = "0x2bd58a19c7e4abf17638c5ee6fa96ee5eb53aed9";
