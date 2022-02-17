@@ -259,9 +259,15 @@ export default async (req, res) => {
   const removeRoles = [];
   Object.keys(roleMap).map((roleKey) => {
     const roleId = roleMap[roleKey];
-    if (existingRoles?.includes(roleId) && !newRoles?.includes(roleId)) {
+    if (existingRoles?.includes(roleId) && !newRoles.includes(roleId)) {
       removeRoles.push(roleId);
     }
+  });
+
+  console.log("requesting", {
+    guildId,
+    userId: session.userId,
+    roleId,
   });
 
   const result = await asyncForEach(addRoles, async (roleId) => {
@@ -275,6 +281,9 @@ export default async (req, res) => {
       }
     );
   });
+
+  console.log("Role result:");
+  console.log(result);
 
   const removeResult = await asyncForEach(removeRoles, async (roleId) => {
     return fetch(
