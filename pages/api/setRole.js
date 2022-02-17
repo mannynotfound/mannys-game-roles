@@ -264,13 +264,12 @@ export default async (req, res) => {
     }
   });
 
-  console.log("requesting", {
-    guildId,
-    userId: session.userId,
-    roleId,
-  });
-
   const result = await asyncForEach(addRoles, async (roleId) => {
+    console.log("requesting", {
+      guildId,
+      userId: session.userId,
+      roleId,
+    });
     return fetch(
       `https://discord.com/api/guilds/${guildId}/members/${session.userId}/roles/${roleId}`,
       {
