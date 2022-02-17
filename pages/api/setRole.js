@@ -252,12 +252,14 @@ export default async (req, res) => {
     .then((response) => response.json())
     .then((data) => data.roles);
 
-  const addRoles = newRoles.filter((roleId) => !existingRoles.includes(roleId));
+  const addRoles = newRoles.filter(
+    (roleId) => !existingRoles?.includes(roleId)
+  );
   // remove token roles if no longer owns
   const removeRoles = [];
   Object.keys(roleMap).map((roleKey) => {
     const roleId = roleMap[roleKey];
-    if (existingRoles.includes(roleId) && !newRoles.includes(roleId)) {
+    if (existingRoles?.includes(roleId) && !newRoles?.includes(roleId)) {
       removeRoles.push(roleId);
     }
   });
@@ -286,7 +288,7 @@ export default async (req, res) => {
     );
   });
 
-  const roleNames = newRoles.map((nr) =>
+  const roleNames = newRoles?.map((nr) =>
     Object.keys(roleMap).find((rm) => roleMap[rm] === nr)
   );
 
