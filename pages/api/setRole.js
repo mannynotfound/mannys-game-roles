@@ -1,6 +1,7 @@
 import { Contract, providers, utils } from "ethers";
 import ABI from "./abi.json";
 import { getSession } from "next-auth/client";
+import { request, gql } from "graphql-request";
 import fetch from "isomorphic-fetch";
 
 const asyncForEach = async (array, callback) => {
@@ -29,6 +30,7 @@ const roleMap = {
   Gamer: "889003509511495691",
   "Special Edition": "929431355442466937",
   Legendary: "929431814567763968",
+  OK: "959995374674796634",
 };
 
 const skinMap = {
@@ -241,6 +243,39 @@ export default async (req, res) => {
   const ownedTokens = await mannysGame.tokensByOwner(address);
   const newRoles = rolePicker(ownedTokens);
 
+  // check for okpcs
+  const query = gql`
+    {
+      wallet(id: "${address.toLowerCase()}") {
+        id,
+        okpcs { 
+          collectedArt {
+            id,
+            artist {
+              name
+            }
+          }
+        }
+      }
+    }
+  `;
+  try {
+    await request(
+      "https://api.thegraph.com/subgraphs/name/okpcnft/okpc",
+      query
+    ).then((data) => {
+      const roleId = roleMap["OK"];
+      data?.wallet?.okpcs?.forEach((d) => {
+        const hasMannys = d.collectedArt.some(
+          (ca) => ca.artist?.name === "mannynotfound.eth"
+        );
+        if (hasMannys && !newRoles.includes(roleId)) {
+          newRoles.push(roleId);
+        }
+      });
+    });
+  } catch (e) {}
+
   const existingRoles = await fetch(
     `https://discord.com/api/guilds/${guildId}/members/${session.userId}`,
     {
@@ -281,26 +316,11 @@ export default async (req, res) => {
     );
   });
 
-  console.log("Role result:");
-  console.log(result);
-
-  const removeResult = await asyncForEach(removeRoles, async (roleId) => {
-    return fetch(
-      `https://discord.com/api/guilds/${guildId}/members/${session.userId}/roles/${roleId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-        },
-      }
-    );
-  });
-
   const roleNames = newRoles?.map((nr) =>
     Object.keys(roleMap).find((rm) => roleMap[rm] === nr)
   );
 
-  // log achievement
+  // log achievements
   fetch("https://mannys.game/api/achievements/30000", {
     method: "POST",
     headers: {
@@ -308,6 +328,16 @@ export default async (req, res) => {
     },
     body: JSON.stringify({ sig, address }),
   });
+
+  if (roleNames.includes("OK")) {
+    fetch("https://mannys.game/api/achievements/20027", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sig, address }),
+    });
+  }
 
   res.send(JSON.stringify({ rolesEarned: roleNames, result, address }));
 };

@@ -17,6 +17,7 @@ const getColor = (role) => {
     Gamer: "#70bf44",
     "Special Edition": "#E91E63",
     Legendary: "#C27C0E",
+    OK: "#00DC82",
   };
 
   return roleMap[role];
