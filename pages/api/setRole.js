@@ -321,7 +321,7 @@ export default async (req, res) => {
   );
 
   // log achievements
-  fetch("https://mannys.game/api/achievements/30000", {
+  fetch("https://mannys-game-server.herokuapp.com/api/achievements/30000", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -330,7 +330,7 @@ export default async (req, res) => {
   });
 
   if (roleNames.includes("OK")) {
-    fetch("https://mannys.game/api/achievements/20027", {
+    fetch("https://mannys-game-server.herokuapp.com/api/achievements/20027", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
