@@ -321,22 +321,28 @@ export default async (req, res) => {
   );
 
   // log achievements
-  fetch("https://mannys-game-server.herokuapp.com/api/achievements/30000", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ sig, address }),
-  });
-
-  if (roleNames.includes("OK")) {
-    fetch("https://mannys-game-server.herokuapp.com/api/achievements/20027", {
+  fetch(
+    "https://mannys-game-server.herokuapp.com/api/achievements/create/30000",
+    {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ sig, address }),
-    });
+    }
+  );
+
+  if (roleNames.includes("OK")) {
+    fetch(
+      "https://mannys-game-server.herokuapp.com/api/achievements/create/20027",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sig, address }),
+      }
+    );
   }
 
   res.send(JSON.stringify({ rolesEarned: roleNames, result, address }));
